@@ -1,29 +1,11 @@
 var express = require('express');
 var router = express.Router();
 
-var SayDAO = require('./../models/Say.js');
+var Say = require('../controllers/say');
 
-router.post('/add', function(req, res) {
-	console.log(req.body);
-	var json = req.body;
-	if(json._id){//update
-	} else {//insert
-		SayDAO.save(json, function(err){
-			if(err) {
-				res.send({'success':false,'err':err});
-			} else {
-				res.send({'success':true});
-			}
-		});
-	}
-});
+router.post('/add', Say.add);
 
-router.get('/all', function(req, res) {
-	SayDAO.findAll(function(err, obj){
-	    res.send(obj);
-	});
-	
-});
+router.get('/all', Say.findAll);
 
 
 module.exports = router;

@@ -4,11 +4,16 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var underscore = require('underscore');
+var session = require('express-session'); 
+var mongoStore = require('connect-mongo')(session)
+
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
+var user = require('./routes/user');
 var say = require('./routes/say');
 var qa = require('./routes/qa');
+var comment = require('./routes/comment');
 
 var app = express();
 
@@ -23,11 +28,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: 'imooc',
+  store: new mongoStore({
+    url: 'mongodb://localhost/nodejs',
+    collection: 'sessions'
+  }),
+  resave: false,
+  saveUninitialized: true
+}))
 
 app.use('/', routes);
-app.use('/users', users);
+app.use('/user', user);
 app.use('/say', say);
 app.use('/qa', qa);
+app.use('/comment', comment);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -60,5 +75,13 @@ app.use(function(err, req, res, next) {
     });
 });
 
+app.set('port', process.env.PORT || 18080);
+var server = app.listen(app.get('port'), function() {
+  console.log("Express server listening on port " + app.get('port'));
+});
 
 module.exports = app;
+
+
+
+
